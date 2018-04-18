@@ -49,7 +49,6 @@ session = Session()
 
 
 class PlanDao(object):
-
     @staticmethod
     def add_plan(new_plan):
         session.add(new_plan)
@@ -63,11 +62,10 @@ class PlanDao(object):
 
 class ActionDao(object):
     @staticmethod
-    def add_actions(actions):
-        import datetime
+    def add_actions(actions, plan_id):
         for action in actions:
             action.status = 0
-            action.complete_time=datetime.datetime.now()
+            action.plan_id = plan_id
         session.add_all(actions)
         session.commit()
 

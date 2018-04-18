@@ -91,18 +91,28 @@ class YuToolsDailyPlan(QWidget):
         self.line_urgency.setFrameShadow(QFrame.Sunken)
 
         self.tb_ac_first = QTableView(self)
+        self.tb_ac_first.horizontalHeader().setStretchLastSection(True)
+        self.tb_ac_first.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tb_ac_first.setGeometry(410, 300, 381, 180)
 
         self.tb_ac_second = QTableView(self)
+        self.tb_ac_second.horizontalHeader().setStretchLastSection(True)
+        self.tb_ac_second.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tb_ac_second.setGeometry(10, 300, 381, 180)
 
         self.tb_ac_third = QTableView(self)
+        self.tb_ac_third.horizontalHeader().setStretchLastSection(True)
+        self.tb_ac_third.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tb_ac_third.setGeometry(10, 495, 381, 180)
 
         self.tb_ac_fourth = QTableView(self)
+        self.tb_ac_fourth.horizontalHeader().setStretchLastSection(True)
+        self.tb_ac_fourth.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tb_ac_fourth.setGeometry(410, 495, 381, 180)
 
         self.refresh_tb_plan()
+        for index in range(1, 5):
+            self.refresh_tb_action(index)
 
     def rb_select_date(self, de_target):
         self.calendar_select.setSelectedDate(de_target.date())
@@ -120,9 +130,12 @@ class YuToolsDailyPlan(QWidget):
             QMessageBox.critical(self, 'Error', data)
             return
 
+        code2, actions = self.generate_actions(data)
+        if code2 == -1:
+            QMessageBox.critical(self, 'Error', actions)
+            return
         PlanDao.add_plan(data)
-        code, actions = self.generate_actions(data)
-        ActionDao.add_actions(actions)
+        ActionDao.add_actions(actions, data.id)
 
         self.txt_content.clear()
 
@@ -156,7 +169,7 @@ class YuToolsDailyPlan(QWidget):
             code = 2
         elif not degree_importance and not degree_urgent:
             code = 3
-        elif not degree_importance and not degree_urgent:
+        elif not degree_importance and degree_urgent:
             code = 4
         return code, plan
 
@@ -173,8 +186,7 @@ class YuToolsDailyPlan(QWidget):
                     return -1, 'There is not time to complete the plan'
             for i in range(plan.repeat):
                 action = Action(content=plan.content, begin_date=plan.begin_date, deadline=plan.deadline,
-                                degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency, status=1,
-                                plan_id=plan.id)
+                                degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency, status=1)
                 action_list.append(action)
         elif plan.frequency == PlanFrequency.Day:
             days = begin.daysTo(deadline)
@@ -189,8 +201,7 @@ class YuToolsDailyPlan(QWidget):
                 for i in range(plan.repeat):
                     action = Action(content=plan.content, begin_date=begin_date, deadline=begin_date,
                                     degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency,
-                                    status=1,
-                                    plan_id=plan.id)
+                                    status=1)
                     action_list.append(action)
         elif plan.frequency == PlanFrequency.Week:
             begin_week, begin_year = begin.weekNumber()
@@ -211,8 +222,8 @@ class YuToolsDailyPlan(QWidget):
                     deadline = datetime.date(current_week_deadline.year(), current_week_deadline.month(),
                                              current_week_deadline.day())
                 elif week == weeks:
-                    begin_date = datetime.date(current_week_deadline.year(), current_week_deadline.month(),
-                                               current_week_deadline.day())
+                    begin_date = datetime.date(current_week_begin.year(), current_week_begin.month(),
+                                               current_week_begin.day())
                     deadline = plan.deadline
                 else:
                     begin_date = datetime.date(current_week_begin.year(), current_week_begin.month(),
@@ -222,8 +233,7 @@ class YuToolsDailyPlan(QWidget):
                 for i in range(plan.repeat):
                     action = Action(content=plan.content, begin_date=begin_date, deadline=deadline,
                                     degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency,
-                                    status=1,
-                                    plan_id=plan.id)
+                                    status=1)
                     action_list.append(action)
         elif plan.frequency == PlanFrequency.Month:
             begin_year = begin.year()
@@ -245,7 +255,10 @@ class YuToolsDailyPlan(QWidget):
                     current_year += 1
                 if month == 0:
                     begin_date = plan.begin_date
-                    deadline = datetime.date(current_year, current_month, begin.daysInMonth())
+                    if month == months:
+                        deadline = plan.deadline
+                    else:
+                        deadline = datetime.date(current_year, current_month, begin.daysInMonth())
                 elif month == months:
                     begin_date = datetime.date(current_year, current_month, 1)
                     deadline = plan.deadline
@@ -257,8 +270,7 @@ class YuToolsDailyPlan(QWidget):
                 for i in range(plan.repeat):
                     action = Action(content=plan.content, begin_date=begin_date, deadline=deadline,
                                     degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency,
-                                    status=1,
-                                    plan_id=plan.id)
+                                    status=1)
                     action_list.append(action)
         elif plan.frequency == PlanFrequency.Quarter:
             begin_year = begin.year()
@@ -294,8 +306,7 @@ class YuToolsDailyPlan(QWidget):
                 for i in range(plan.repeat):
                     action = Action(content=plan.content, begin_date=begin_date, deadline=deadline,
                                     degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency,
-                                    status=1,
-                                    plan_id=plan.id)
+                                    status=1)
                     action_list.append(action)
         elif plan.frequency == PlanFrequency.Year:
             begin_year = begin.year()
@@ -320,8 +331,7 @@ class YuToolsDailyPlan(QWidget):
                 for i in range(plan.repeat):
                     action = Action(content=plan.content, begin_date=begin_date, deadline=deadline,
                                     degree_importance=plan.degree_importance, degree_urgency=plan.degree_urgency,
-                                    status=1,
-                                    plan_id=plan.id)
+                                    status=1)
                     action_list.append(action)
         return 0, action_list
 
@@ -346,13 +356,13 @@ class YuToolsDailyPlan(QWidget):
     def refresh_tb_action(self, tb_index):
         actions = ActionDao.query_actions(tb_index)
         model = QStandardItemModel(len(actions), 3)
-        model.setHorizontalHeaderLabels(['Content', 'Begin', 'Deadline', 'Status'])
+        model.setHorizontalHeaderLabels(['Content', 'Begin', 'Deadline'])
         row_index = 0
         for action in actions:
             model.setItem(row_index, 0, QStandardItem(action.content))
             model.setItem(row_index, 1, QStandardItem(action.begin_date.strftime("%Y/%m/%d")))
             model.setItem(row_index, 2, QStandardItem(action.deadline.strftime("%Y/%m/%d")))
-            model.setItem(row_index, 3, QStandardItem(self.status_label[action.status]))
+            # model.setItem(row_index, 3, QStandardItem(self.status_label[action.status]))
             row_index += 1
         if tb_index == 1:
             self.tb_ac_first.setModel(model)

@@ -3,3 +3,4 @@ __pycache__
 *.xml
 *.iml
 designer.py
+*.db
