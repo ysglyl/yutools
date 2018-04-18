@@ -1,5 +1,7 @@
 import enum
-from sqlalchemy import create_engine, Column, Integer, String, Date, DateTime, Enum, Boolean
+from sqlalchemy import create_engine, \
+    Column, Integer, String, Date, DateTime, Enum, Boolean, \
+    and_, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -24,9 +26,8 @@ class Plan(Base):
     deadline = Column(Date)
     frequency = Column(Enum(PlanFrequency))
     repeat = Column(Integer)
-    degree_importance = Column(Integer)
-    degree_urgency = Column(Integer)
-    can_op_all = Column(Boolean)
+    degree_importance = Column(Boolean)
+    degree_urgency = Column(Boolean)
 
 
 class Action(Base):
@@ -38,7 +39,8 @@ class Action(Base):
     degree_importance = Column(Integer)
     degree_urgency = Column(Integer)
     status = Column(Integer)
-    complete_time = Column(DateTime)
+    complete_time = Column(DateTime, nullable=True)
+    plan_id = Column(Integer, ForeignKey('tb_plan.id'))
 
 
 Base.metadata.create_all(engine)
@@ -58,3 +60,33 @@ class PlanDao(object):
     def query_plans():
         return session.query(Plan).order_by(Plan.id).all()
 
+
+class ActionDao(object):
+    @staticmethod
+    def add_actions(actions):
+        import datetime
+        for action in actions:
+            action.status = 0
+            action.complete_time=datetime.datetime.now()
+        session.add_all(actions)
+        session.commit()
+
+    @staticmethod
+    def query_actions(filter_type):
+        if filter_type == 1:
+            return session.query(Action).filter(
+                and_(Action.degree_importance == True, Action.degree_urgency == True)).order_by(Action.begin_date).all()
+        elif filter_type == 2:
+            return session.query(Action).filter(
+                and_(Action.degree_importance == True, Action.degree_urgency == False)).order_by(
+                Action.begin_date).all()
+        elif filter_type == 3:
+            return session.query(Action).filter(
+                and_(Action.degree_importance == False, Action.degree_urgency == False)).order_by(
+                Action.begin_date).all()
+        elif filter_type == 4:
+            return session.query(Action).filter(
+                and_(Action.degree_importance == False, Action.degree_urgency == True)).order_by(
+                Action.begin_date).all()
+        else:
+            return None

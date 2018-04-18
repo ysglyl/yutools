@@ -19,7 +19,7 @@ class YuToolsMainWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.setFixedSize(800, 700)
+        self.setFixedSize(803, 705)
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)

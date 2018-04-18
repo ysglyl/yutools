@@ -16,7 +16,7 @@ class YuToolsTabsMain(QWidget):
     def __init__(self, parent):
         super().__init__()
         self.tabs = QTabWidget(parent)
-        self.tabs.setGeometry(0, 0, 800, 660)
+        self.tabs.setGeometry(0, 0, 805, 705)
 
         self.tab_daily_plan = YuToolsDailyPlan()
         self.tabs.addTab(self.tab_daily_plan, QIcon('icons/icon.png'), "Daily Plan")
