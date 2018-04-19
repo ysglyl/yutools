@@ -1,10 +1,10 @@
 import datetime
 
-from PyQt5.QtCore import QDate
+from PyQt5.QtCore import QDate, QPoint
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QComboBox, QSpinBox, \
     QCheckBox, QPushButton, QFrame, QTableView, QCalendarWidget, QDateEdit, QRadioButton, \
-    QMessageBox, QHeaderView
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+    QMessageBox, QHeaderView, QItemDelegate, QMenu
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon
 
 from daily_plan.db_helper import PlanFrequency, Plan, Action, PlanDao, ActionDao
 
@@ -12,7 +12,6 @@ from daily_plan.db_helper import PlanFrequency, Plan, Action, PlanDao, ActionDao
 class YuToolsDailyPlan(QWidget):
     def __init__(self):
         super().__init__()
-        self.status_label = {0: 'Wait', 1: 'Going', 2: 'Done', 3: 'Expire'}
 
         self.txt_content = QPlainTextEdit(self)
         self.txt_content.setGeometry(10, 10, 350, 50)
@@ -77,7 +76,8 @@ class YuToolsDailyPlan(QWidget):
 
         self.tb_plan = QTableView(self)
         self.tb_plan.horizontalHeader().setStretchLastSection(True)
-        self.tb_plan.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_plan.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
+        self.tb_plan.verticalHeader().hide()
         self.tb_plan.setGeometry(370, 10, 421, 281)
 
         self.line_importance = QFrame(self)
@@ -90,25 +90,39 @@ class YuToolsDailyPlan(QWidget):
         self.line_urgency.setFrameShape(QFrame.HLine)
         self.line_urgency.setFrameShadow(QFrame.Sunken)
 
+        self.cb_show_all = QCheckBox(self)
+        self.cb_show_all.setGeometry(393, 475, 26, 26)
+        self.cb_show_all.stateChanged.connect(self.change_tb_ac_list)
+
         self.tb_ac_first = QTableView(self)
         self.tb_ac_first.horizontalHeader().setStretchLastSection(True)
-        self.tb_ac_first.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_ac_first.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
+        self.tb_ac_first.verticalHeader().hide()
+        self.tb_ac_first.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_first))
         self.tb_ac_first.setGeometry(410, 300, 381, 180)
 
         self.tb_ac_second = QTableView(self)
         self.tb_ac_second.horizontalHeader().setStretchLastSection(True)
-        self.tb_ac_second.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_ac_second.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
+        self.tb_ac_second.verticalHeader().hide()
+        self.tb_ac_second.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_second))
         self.tb_ac_second.setGeometry(10, 300, 381, 180)
 
         self.tb_ac_third = QTableView(self)
         self.tb_ac_third.horizontalHeader().setStretchLastSection(True)
-        self.tb_ac_third.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_ac_third.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
+        self.tb_ac_third.verticalHeader().hide()
+        self.tb_ac_third.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_third))
         self.tb_ac_third.setGeometry(10, 495, 381, 180)
 
         self.tb_ac_fourth = QTableView(self)
         self.tb_ac_fourth.horizontalHeader().setStretchLastSection(True)
-        self.tb_ac_fourth.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_ac_fourth.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
+        self.tb_ac_fourth.verticalHeader().hide()
+        self.tb_ac_fourth.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_fourth))
         self.tb_ac_fourth.setGeometry(410, 495, 381, 180)
+
+        self.tb_acs = {1: self.tb_ac_first, 2: self.tb_ac_second, 3: self.tb_ac_third, 4: self.tb_ac_fourth}
 
         self.refresh_tb_plan()
         for index in range(1, 5):
@@ -134,8 +148,8 @@ class YuToolsDailyPlan(QWidget):
         if code2 == -1:
             QMessageBox.critical(self, 'Error', actions)
             return
-        PlanDao.add_plan(data)
-        ActionDao.add_actions(actions, data.id)
+        plan_id = PlanDao.add_plan(data)
+        ActionDao.add_actions(actions, plan_id)
 
         self.txt_content.clear()
 
@@ -219,8 +233,11 @@ class YuToolsDailyPlan(QWidget):
                 current_week_begin = current_week_deadline.addDays(-6)
                 if week == 0:
                     begin_date = plan.begin_date
-                    deadline = datetime.date(current_week_deadline.year(), current_week_deadline.month(),
-                                             current_week_deadline.day())
+                    if week == weeks:
+                        deadline = plan.deadline
+                    else:
+                        deadline = datetime.date(current_week_deadline.year(), current_week_deadline.month(),
+                                                 current_week_deadline.day())
                 elif week == weeks:
                     begin_date = datetime.date(current_week_begin.year(), current_week_begin.month(),
                                                current_week_begin.day())
@@ -296,7 +313,10 @@ class YuToolsDailyPlan(QWidget):
                 deadline_month = begin_month + 2
                 if quarter == 0:
                     begin_date = plan.begin_date
-                    deadline = datetime.date(current_year, deadline_month, (30 if deadline_month == 4 else 31))
+                    if quarter == quarters:
+                        deadline = plan.deadline
+                    else:
+                        deadline = datetime.date(current_year, deadline_month, (30 if deadline_month == 4 else 31))
                 elif quarter == quarters:
                     begin_date = datetime.date(current_year, begin_month, 1)
                     deadline = plan.deadline
@@ -321,7 +341,10 @@ class YuToolsDailyPlan(QWidget):
                 current_year = begin_year + year
                 if year == 0:
                     begin_date = plan.begin_date
-                    deadline = datetime.date(current_year, 12, 31)
+                    if year == years:
+                        deadline = plan.deadline
+                    else:
+                        deadline = datetime.date(current_year, 12, 31)
                 elif year == years:
                     begin_date = datetime.date(current_year, 1, 1)
                     deadline = plan.deadline
@@ -335,40 +358,102 @@ class YuToolsDailyPlan(QWidget):
                     action_list.append(action)
         return 0, action_list
 
+    def change_tb_ac_list(self):
+        for index in range(1, 5):
+            self.refresh_tb_action(index)
+
     def refresh_tb_plan(self):
         plans = PlanDao.query_plans()
         model = QStandardItemModel(len(plans), 3)
         model.setHorizontalHeaderLabels(['Content', 'Frequency', 'Flag'])
         row_index = 0
         for plan in plans:
-            model.setItem(row_index, 0, QStandardItem(plan.content))
-            # model.setItem(row_index, 1, QStandardItem(plan.begin_date.strftime("%Y/%m/%d")))
-            # model.setItem(row_index, 2, QStandardItem(plan.deadline.strftime("%Y/%m/%d")))
-            model.setItem(row_index, 1, QStandardItem(plan.frequency.name))
-            # model.setItem(row_index, 2, QStandardItem(str(plan.repeat)))
-            model.setItem(row_index, 2,
-                          QStandardItem('{},{}'.format('Important' if plan.degree_importance else 'Unimportant',
-                                                       'Urgency' if plan.degree_urgency else 'Non-urgency')))
-
+            qsi_content = QStandardItem(plan.content)
+            qsi_content.setEditable(False)
+            qsi_frequency = QStandardItem(plan.frequency.name)
+            qsi_frequency.setEditable(False)
+            qsi_flag = QStandardItem('{},{}'.format('Important' if plan.degree_importance else 'Unimportant',
+                                                    'Urgency' if plan.degree_urgency else 'Non-urgency'))
+            qsi_flag.setEditable(False)
+            model.setItem(row_index, 0, qsi_content)
+            model.setItem(row_index, 1, qsi_frequency)
+            model.setItem(row_index, 2, qsi_flag)
             row_index += 1
         self.tb_plan.setModel(model)
+        self.tb_plan.setColumnWidth(0, 220)
+        self.tb_plan.setColumnWidth(1, 70)
+        self.tb_plan.setColumnWidth(2, 100)
 
     def refresh_tb_action(self, tb_index):
-        actions = ActionDao.query_actions(tb_index)
+        tb_action = self.tb_acs[tb_index]
+        show_all = self.cb_show_all.isChecked()
+        actions = ActionDao.query_actions(tb_index,show_all)
         model = QStandardItemModel(len(actions), 3)
-        model.setHorizontalHeaderLabels(['Content', 'Begin', 'Deadline'])
+        model.setHorizontalHeaderLabels(['Content', 'Begin', 'Deadline', 'Status'])
         row_index = 0
         for action in actions:
-            model.setItem(row_index, 0, QStandardItem(action.content))
-            model.setItem(row_index, 1, QStandardItem(action.begin_date.strftime("%Y/%m/%d")))
-            model.setItem(row_index, 2, QStandardItem(action.deadline.strftime("%Y/%m/%d")))
-            # model.setItem(row_index, 3, QStandardItem(self.status_label[action.status]))
+            qsi_content = QStandardItem(action.content)
+            qsi_content.setEditable(False)
+            qsi_begin_date = QStandardItem(action.begin_date.strftime("%Y/%m/%d"))
+            qsi_content.setEditable(False)
+            qsi_deadline = QStandardItem(action.deadline.strftime("%Y/%m/%d"))
+            qsi_deadline.setEditable(False)
+            qsi_status = QStandardItem()
+            qsi_status.setData({'id': action.id, 'status': action.status})
+            qsi_status.setEditable(False)
+            model.setItem(row_index, 0, qsi_content)
+            model.setItem(row_index, 1, qsi_begin_date)
+            model.setItem(row_index, 2, qsi_deadline)
+            model.setItem(row_index, 3, qsi_status)
             row_index += 1
-        if tb_index == 1:
-            self.tb_ac_first.setModel(model)
-        elif tb_index == 2:
-            self.tb_ac_second.setModel(model)
-        elif tb_index == 3:
-            self.tb_ac_third.setModel(model)
-        elif tb_index == 4:
-            self.tb_ac_fourth.setModel(model)
+        tb_action.setModel(model)
+        tb_action.setColumnWidth(0, 160)
+        tb_action.setColumnWidth(1, 70)
+        tb_action.setColumnWidth(2, 70)
+        tb_action.setColumnWidth(3, 40)
+
+    def change_status(self, tb_action, act_id, status):
+        if status == 0:
+            QMessageBox.information(self, 'Tip', 'Please wait for beginning')
+        elif status == 1:
+            menu = QMenu(tb_action)
+            done_act = menu.addAction(QIcon('icons/daily_plan/done.png'), 'Done')
+            cancel_act = menu.addAction(QIcon('icons/daily_plan/cancel.png'), 'Cancel')
+            act = menu.exec_(tb_action.mapToGlobal(QPoint(self.sender().x(), self.sender().y() + 10)))
+            refresh = False
+            if act == done_act:
+                ActionDao.update_action(act_id, 2)
+                refresh = True
+            elif act == cancel_act:
+                ActionDao.update_action(act_id, 3)
+                refresh = True
+            if refresh:
+                self.refresh_tb_action(list(self.tb_acs.keys())[list(self.tb_acs.values()).index(tb_action)])
+        elif status == 2:
+            QMessageBox.information(self, 'Tip', 'You are good that had completed the task')
+        elif status == 3:
+            QMessageBox.information(self, 'Tip', 'It is sadly you had canceled this task')
+        elif status == 4:
+            QMessageBox.information(self, 'Tip', 'It is sorry that this task had expired and you cannot operate it')
+
+
+class ActionStatusDelegate(QItemDelegate):
+    def __init__(self, parent=None):
+        super(ActionStatusDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        if not self.parent().indexWidget(index):
+            data = index.model().item(index.row(), index.column()).data()
+            btn = QPushButton(ActionDao.status_label[data['status']], self.parent())
+            if data['status'] == 0:
+                btn.setIcon(QIcon('icons/daily_plan/wait.png'))
+            elif data['status'] == 1:
+                btn.setIcon(QIcon('icons/daily_plan/going.png'))
+            elif data['status'] == 2:
+                btn.setIcon(QIcon('icons/daily_plan/done.png'))
+            elif data['status'] == 3:
+                btn.setIcon(QIcon('icons/daily_plan/cancel.png'))
+            elif data['status'] == 4:
+                btn.setIcon(QIcon('icons/daily_plan/expire'))
+            btn.clicked.connect(lambda: self.parent().parent().change_status(self.parent(), data['id'], data['status']))
+            self.parent().setIndexWidget(index, btn)

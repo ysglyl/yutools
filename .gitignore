@@ -4,3 +4,4 @@ __pycache__
 *.iml
 designer.py
 *.db
+test.py

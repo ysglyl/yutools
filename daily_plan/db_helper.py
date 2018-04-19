@@ -1,4 +1,5 @@
 import enum
+import datetime
 from sqlalchemy import create_engine, \
     Column, Integer, String, Date, DateTime, Enum, Boolean, \
     and_, ForeignKey
@@ -61,30 +62,40 @@ class PlanDao(object):
 
 
 class ActionDao(object):
+    status_label = {0: 'Wait', 1: 'Going', 2: 'Done', 3: 'Cancel', 4: 'Expire'}
+
     @staticmethod
     def add_actions(actions, plan_id):
         for action in actions:
-            action.status = 0
             action.plan_id = plan_id
+            if (datetime.date.today() - action.begin_date).days <= 0:
+                action.status = 1
+            else:
+                action.status = 0
         session.add_all(actions)
         session.commit()
 
     @staticmethod
-    def query_actions(filter_type):
+    def update_action(act_id, status):
+        session.query(Action).filter(Action.id == act_id).update(
+            {Action.status: status, Action.complete_time: datetime.date.today()})
+        session.commit()
+
+    @staticmethod
+    def query_actions(filter_type, show_all):
+        query = session.query(Action)
         if filter_type == 1:
-            return session.query(Action).filter(
-                and_(Action.degree_importance == True, Action.degree_urgency == True)).order_by(Action.begin_date).all()
+            query = query.filter(
+                and_(Action.degree_importance == True, Action.degree_urgency == True))
         elif filter_type == 2:
-            return session.query(Action).filter(
-                and_(Action.degree_importance == True, Action.degree_urgency == False)).order_by(
-                Action.begin_date).all()
+            query = query.filter(
+                and_(Action.degree_importance == True, Action.degree_urgency == False))
         elif filter_type == 3:
-            return session.query(Action).filter(
-                and_(Action.degree_importance == False, Action.degree_urgency == False)).order_by(
-                Action.begin_date).all()
+            query = session.query(Action).filter(
+                and_(Action.degree_importance == False, Action.degree_urgency == False))
         elif filter_type == 4:
-            return session.query(Action).filter(
-                and_(Action.degree_importance == False, Action.degree_urgency == True)).order_by(
-                Action.begin_date).all()
-        else:
-            return None
+            query = session.query(Action).filter(
+                and_(Action.degree_importance == False, Action.degree_urgency == True))
+        if not show_all:
+            query = query.filter(Action.status.in_([1]))
+        return query.order_by(Action.begin_date).all()

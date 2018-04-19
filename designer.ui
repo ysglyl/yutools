@@ -269,5 +269,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_batch_op</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>cb_batch_op</receiver>
+   <slot>animateClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>193</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>326</x>
+     <y>191</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
