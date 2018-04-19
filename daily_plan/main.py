@@ -12,7 +12,7 @@ from daily_plan.db_helper import PlanFrequency, Plan, Action, PlanDao, ActionDao
 class YuToolsDailyPlan(QWidget):
     def __init__(self):
         super().__init__()
-
+        ActionDao.auto_update_action()
         self.txt_content = QPlainTextEdit(self)
         self.txt_content.setGeometry(10, 10, 350, 50)
 
@@ -90,41 +90,50 @@ class YuToolsDailyPlan(QWidget):
         self.line_urgency.setFrameShape(QFrame.HLine)
         self.line_urgency.setFrameShadow(QFrame.Sunken)
 
-        self.cb_show_all = QCheckBox(self)
-        self.cb_show_all.setGeometry(393, 475, 26, 26)
-        self.cb_show_all.stateChanged.connect(self.change_tb_ac_list)
+        self.combo_ac_list_filter = QComboBox(self)
+        self.combo_ac_list_filter.addItem('Wait')
+        self.combo_ac_list_filter.addItem('Going')
+        self.combo_ac_list_filter.addItem('Done')
+        self.combo_ac_list_filter.addItem('Cancel')
+        self.combo_ac_list_filter.addItem('Expire')
+        self.combo_ac_list_filter.addItem('Will')
+        self.combo_ac_list_filter.addItem('All')
+        self.combo_ac_list_filter.setCurrentIndex(1)
+        self.combo_ac_list_filter.setGeometry(375, 478, 50, 20)
+        self.combo_ac_list_filter.currentIndexChanged.connect(self.change_tb_ac_list)
 
         self.tb_ac_first = QTableView(self)
         self.tb_ac_first.horizontalHeader().setStretchLastSection(True)
         self.tb_ac_first.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_ac_first.verticalHeader().hide()
         self.tb_ac_first.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_first))
-        self.tb_ac_first.setGeometry(410, 300, 381, 180)
+        self.tb_ac_first.setGeometry(410, 300, 381, 178)
 
         self.tb_ac_second = QTableView(self)
         self.tb_ac_second.horizontalHeader().setStretchLastSection(True)
         self.tb_ac_second.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_ac_second.verticalHeader().hide()
         self.tb_ac_second.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_second))
-        self.tb_ac_second.setGeometry(10, 300, 381, 180)
+        self.tb_ac_second.setGeometry(10, 300, 381, 178)
 
         self.tb_ac_third = QTableView(self)
         self.tb_ac_third.horizontalHeader().setStretchLastSection(True)
         self.tb_ac_third.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_ac_third.verticalHeader().hide()
         self.tb_ac_third.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_third))
-        self.tb_ac_third.setGeometry(10, 495, 381, 180)
+        self.tb_ac_third.setGeometry(10, 498, 381, 178)
 
         self.tb_ac_fourth = QTableView(self)
         self.tb_ac_fourth.horizontalHeader().setStretchLastSection(True)
         self.tb_ac_fourth.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_ac_fourth.verticalHeader().hide()
         self.tb_ac_fourth.setItemDelegateForColumn(3, ActionStatusDelegate(self.tb_ac_fourth))
-        self.tb_ac_fourth.setGeometry(410, 495, 381, 180)
+        self.tb_ac_fourth.setGeometry(410, 498, 381, 178)
 
         self.tb_acs = {1: self.tb_ac_first, 2: self.tb_ac_second, 3: self.tb_ac_third, 4: self.tb_ac_fourth}
 
         self.refresh_tb_plan()
+
         for index in range(1, 5):
             self.refresh_tb_action(index)
 
@@ -386,8 +395,8 @@ class YuToolsDailyPlan(QWidget):
 
     def refresh_tb_action(self, tb_index):
         tb_action = self.tb_acs[tb_index]
-        show_all = self.cb_show_all.isChecked()
-        actions = ActionDao.query_actions(tb_index,show_all)
+        ac_list_filter = self.combo_ac_list_filter.currentIndex()
+        actions = ActionDao.query_actions(tb_index, ac_list_filter)
         model = QStandardItemModel(len(actions), 3)
         model.setHorizontalHeaderLabels(['Content', 'Begin', 'Deadline', 'Status'])
         row_index = 0
@@ -407,9 +416,9 @@ class YuToolsDailyPlan(QWidget):
             model.setItem(row_index, 3, qsi_status)
             row_index += 1
         tb_action.setModel(model)
-        tb_action.setColumnWidth(0, 160)
-        tb_action.setColumnWidth(1, 70)
-        tb_action.setColumnWidth(2, 70)
+        tb_action.setColumnWidth(0, 150)
+        tb_action.setColumnWidth(1, 75)
+        tb_action.setColumnWidth(2, 75)
         tb_action.setColumnWidth(3, 40)
 
     def change_status(self, tb_action, act_id, status):

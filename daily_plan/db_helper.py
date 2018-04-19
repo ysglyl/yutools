@@ -68,7 +68,7 @@ class ActionDao(object):
     def add_actions(actions, plan_id):
         for action in actions:
             action.plan_id = plan_id
-            if (datetime.date.today() - action.begin_date).days <= 0:
+            if action.begin_date == datetime.date.today():
                 action.status = 1
             else:
                 action.status = 0
@@ -82,20 +82,35 @@ class ActionDao(object):
         session.commit()
 
     @staticmethod
-    def query_actions(filter_type, show_all):
+    def auto_update_action():
+        session.query(Action).filter(and_(Action.status == 0, Action.begin_date <= datetime.date.today())).update(
+            {Action.status: 1})
+        session.commit()
+        session.query(Action).filter(and_(Action.status == 0, Action.deadline < datetime.date.today())).update(
+            {Action.status: 4})
+        session.commit
+
+    @staticmethod
+    def query_actions(tb_index, filter_status):
         query = session.query(Action)
-        if filter_type == 1:
+        if tb_index == 1:
             query = query.filter(
                 and_(Action.degree_importance == True, Action.degree_urgency == True))
-        elif filter_type == 2:
+        elif tb_index == 2:
             query = query.filter(
                 and_(Action.degree_importance == True, Action.degree_urgency == False))
-        elif filter_type == 3:
+        elif tb_index == 3:
             query = session.query(Action).filter(
                 and_(Action.degree_importance == False, Action.degree_urgency == False))
-        elif filter_type == 4:
+        elif tb_index == 4:
             query = session.query(Action).filter(
                 and_(Action.degree_importance == False, Action.degree_urgency == True))
-        if not show_all:
-            query = query.filter(Action.status.in_([1]))
+        if filter_status in [0, 1, 2, 3, 4]:
+            query = query.filter(Action.status == filter_status)
+        elif filter_status == 5:
+            query = query.filter(Action.status.in_([0, 1]))
+        elif filter_status == 6:
+            pass
+        else:
+            query = query.filter(Action.status == -1)
         return query.order_by(Action.begin_date).all()
