@@ -14,274 +14,43 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="main_tabs">
-   <widget class="QLabel" name="lbl_deadline">
+   <widget class="QTableView" name="tableView">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>70</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Deadline</string>
-    </property>
-   </widget>
-   <widget class="Line" name="line_inportance">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>290</y>
-      <width>20</width>
-      <height>441</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tb_plan">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>10</y>
-      <width>421</width>
-      <height>281</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="cb_batch_op">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>160</y>
-      <width>70</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Batch Op</string>
-    </property>
-   </widget>
-   <widget class="QCalendarWidget" name="calendar_select">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
+      <x>380</x>
+      <y>270</y>
       <width>256</width>
-      <height>191</height>
+      <height>192</height>
      </rect>
     </property>
    </widget>
-   <widget class="QTableView" name="tb_ac_third">
+   <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>520</y>
-      <width>381</width>
-      <height>201</height>
+      <x>70</x>
+      <y>60</y>
+      <width>256</width>
+      <height>192</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tb_ac_second">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>300</y>
-      <width>381</width>
-      <height>201</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="combo_urgency">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>220</y>
-      <width>69</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lbl_begin">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>41</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Begin </string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_save">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>260</y>
-      <width>71</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="sb_repeat">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>130</y>
-      <width>71</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="combo_frequency">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>100</y>
-      <width>69</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="txt_content">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>341</width>
-      <height>51</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="le_deadline">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>70</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tb_ac_first">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>300</y>
-      <width>381</width>
-      <height>201</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="combo_importance">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>190</y>
-      <width>69</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tb_ac_fourth">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>520</y>
-      <width>381</width>
-      <height>201</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="Line" name="line_urgency">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>500</y>
-      <width>791</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QDateEdit" name="dateEdit">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>70</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>70</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RadioButton</string>
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>calendar_select</sender>
-   <signal>activated(QDate)</signal>
-   <receiver>le_deadline</receiver>
-   <slot>selectAll()</slot>
+   <sender>tableView</sender>
+   <signal>customContextMenuRequested(QPoint)</signal>
+   <receiver>tableView</receiver>
+   <slot>doItemsLayout()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>212</x>
-     <y>213</y>
+     <x>489</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
-     <x>261</x>
-     <y>106</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_batch_op</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>cb_batch_op</receiver>
-   <slot>animateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>284</x>
-     <y>193</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>326</x>
-     <y>191</y>
+     <x>554</x>
+     <y>395</y>
     </hint>
    </hints>
   </connection>
