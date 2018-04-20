@@ -9,6 +9,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget
 from PyQt5.QtGui import QIcon
 from daily_plan.main import YuToolsDailyPlan
+from statistics_word_en.main import YuToolsStatisticsWordEn
 
 
 class YuToolsTabsMain(QWidget):
@@ -19,15 +20,12 @@ class YuToolsTabsMain(QWidget):
         self.tabs.setGeometry(0, 0, 805, 705)
 
         self.tab_daily_plan = YuToolsDailyPlan()
-        self.tabs.addTab(self.tab_daily_plan, QIcon('icons/icon.png'), "Daily Plan")
+        self.tabs.addTab(self.tab_daily_plan, QIcon('icons/daily_plan.png'), "Daily Plan")
 
-        self.tab_linux_skill = QWidget(parent)
-        self.tabs.addTab(self.tab_linux_skill, "Linux Skill")
+        self.tab_statistics_word_en = YuToolsStatisticsWordEn()
+        self.tabs.addTab(self.tab_statistics_word_en, QIcon('icons/statistics_word_en.png'), "Statistics EN")
 
-        self.tab_text_handle = QWidget(parent)
-        self.tabs.addTab(self.tab_text_handle, "Text Handle")
+        self.tabs.setCurrentIndex(1)
 
-        self.tab_image_handle = QWidget(parent)
-        self.tabs.addTab(self.tab_image_handle, "Image Handle")
-
-        self.tabs.setCurrentIndex(0)
+    def closeEvent(self, QCloseEvent):
+        print(1)

@@ -16,6 +16,7 @@ from tabs import YuToolsTabsMain
 class YuToolsMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.app_running = True
         self.init_ui()
 
     def init_ui(self):
@@ -26,6 +27,9 @@ class YuToolsMainWindow(QMainWindow):
         self.move(qr.topLeft())
         self.setWindowIcon(QIcon('icons/icon.png'))
         self.setWindowTitle('YuTools')
+
+    def closeEvent(self, *args, **kwargs):
+        self.app_running = False
 
 
 if __name__ == '__main__':
