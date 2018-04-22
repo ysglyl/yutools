@@ -8,9 +8,10 @@ from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QComboBox, QListWidget, \
     QMessageBox, QHeaderView, QItemDelegate, QMenu, QLabel, QTextEdit
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon, QFont
 
+from statistics_word_en.db_helper import Waste, Word, WasteDao, WordDao
+
 
 class YuToolsStatisticsWordEn(QWidget):
-
     def __init__(self):
         super().__init__()
 
@@ -34,12 +35,13 @@ class YuToolsStatisticsWordEn(QWidget):
         self.lbl_op_tips.setText('Double click table cell for more operations')
         self.lbl_op_tips.setFont(font)
         self.lbl_op_tips.setStyleSheet("color: rgb(0, 0, 255);")
-        self.lbl_op_tips.setGeometry(490,10,300,22)
+        self.lbl_op_tips.setGeometry(440, 10, 350, 22)
 
         self.tb_word_cur = QTableView(self)
         self.tb_word_cur.horizontalHeader().setStretchLastSection(True)
         self.tb_word_cur.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_word_cur.setGeometry(560, 40, 230, 280)
+        self.tb_word_cur.clicked.connect(self.tb_click)
         self.tb_word_cur.doubleClicked.connect(self.tb_double_click)
 
         self.line = QFrame(self)
@@ -126,9 +128,11 @@ class YuToolsStatisticsWordEn(QWidget):
             copy_act = menu.addAction(QIcon('icons/statistics_word_en/copy.png'), 'Copy')
             word_act = menu.addAction(QIcon('icons/statistics_word_en/word.png'), 'Word')
             waste_act = menu.addAction(QIcon('icons/statistics_word_en/waste.png'), 'Waste')
+            i = index.row()
+            i = i if i < 9 else 8
             act = menu.exec_(
                 self.mapToGlobal(
-                    QPoint(self.sender().x() + 60 * index.column() + 30, self.sender().y() + 30 * index.row() + 5)))
+                    QPoint(self.sender().x() + 60 * index.column() + 30, self.sender().y() + 30 * i + 5)))
             refresh = False
             if act == copy_act:
                 pyperclip.copy(index.model().item(index.row(), index.column()).text())
@@ -136,3 +140,6 @@ class YuToolsStatisticsWordEn(QWidget):
                 refresh = True
             elif act == waste_act:
                 refresh = True
+
+    def tb_click(self, index):
+        print(index)

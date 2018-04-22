@@ -12,17 +12,11 @@ class Waste(Base):
     word = Column(String)
 
 
-class Statistics(Base):
-    __tablename__ = 'tb_statistics'
-    id = Column(Integer, primary_key=True)
-    word = Column(String)
-    amount = Column(Integer, default=0)
-
-
 class Word(Base):
     __tablename__ = 'tb_word'
     id = Column(Integer, primary_key=True)
     word = Column(String)
+    amount = Column(Integer, default=0)
     explain = Column(String)
 
 
@@ -31,11 +25,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-class ExclusionDao(object):
-    pass
-
-
-class StatisticsDao(object):
+class WasteDao(object):
     pass
 
 
