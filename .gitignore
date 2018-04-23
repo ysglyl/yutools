@@ -5,3 +5,4 @@ __pycache__
 designer.py
 *.db
 test.py
+note_viewer/notes/**

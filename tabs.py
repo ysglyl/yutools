@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget
 from PyQt5.QtGui import QIcon
 from daily_plan.main import YuToolsDailyPlan
 from statistics_word_en.main import YuToolsStatisticsWordEn
+from note_viewer.main import YuToolsNoteViewer
 
 
 class YuToolsTabsMain(QWidget):
@@ -25,7 +26,10 @@ class YuToolsTabsMain(QWidget):
         self.tab_statistics_word_en = YuToolsStatisticsWordEn()
         self.tabs.addTab(self.tab_statistics_word_en, QIcon('icons/statistics_word_en.png'), "Statistics EN")
 
-        self.tabs.setCurrentIndex(1)
+        self.tab_note_viewer = YuToolsNoteViewer()
+        self.tabs.addTab(self.tab_note_viewer, QIcon('icons/note_viewer.png'), 'Note Viewer')
+
+        self.tabs.setCurrentIndex(2)
 
     def closeEvent(self, QCloseEvent):
         print(1)
