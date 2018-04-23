@@ -42,7 +42,6 @@ class YuToolsStatisticsWordEn(QWidget):
         self.tb_word_cur.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_word_cur.setGeometry(560, 40, 230, 280)
         self.tb_word_cur.clicked.connect(self.tb_click)
-        self.tb_word_cur.doubleClicked.connect(self.tb_double_click)
 
         self.line = QFrame(self)
         self.line.setGeometry(10, 326, 781, 5)
@@ -51,9 +50,13 @@ class YuToolsStatisticsWordEn(QWidget):
 
         self.ls_waste = QListWidget(self)
         self.ls_waste.setGeometry(10, 335, 131, 340)
+        self.ls_waste.itemDoubleClicked.connect(self.remove_waste)
 
         self.tb_word_his = QTableView(self)
+        self.tb_word_his.horizontalHeader().setStretchLastSection(True)
+        self.tb_word_his.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
         self.tb_word_his.setGeometry(165, 335, 291, 340)
+        self.tb_word_his.clicked.connect(self.tb_click)
 
         self.txt_explain = QTextEdit(self)
         self.txt_explain.setReadOnly(True)
@@ -63,10 +66,14 @@ class YuToolsStatisticsWordEn(QWidget):
         self.btn_edit_explain.setText('Edit')
         self.btn_edit_explain.clicked.connect(self.click_handler)
         self.btn_edit_explain.setGeometry(730, 650, 60, 26)
-        self.explain_edit_flag = False
+        self.edit_explain_flag = False
 
-        self.wastes = ['a', 'one', 'the', 'on', 'in', 'to']
-        self.ls_waste.addItems(self.wastes)
+        self.wastes = []
+        self.refresh_list_waste()
+
+        self.refresh_tb_word()
+
+        self.show_explain_word = None
 
         threading.Timer(1, self.show_now_time).start()
 
@@ -80,14 +87,16 @@ class YuToolsStatisticsWordEn(QWidget):
         if sender == self.btn_statistics:
             self.refresh_tb_statistics()
         elif sender == self.btn_edit_explain:
-            if self.explain_edit_flag:
-                self.explain_edit_flag = False
+            if self.edit_explain_flag:
+                self.edit_explain_flag = False
+                WordDao.update(self.show_explain_word, self.txt_explain.toPlainText())
                 sender.setText('Edit')
                 self.txt_explain.setReadOnly(True)
             else:
-                self.explain_edit_flag = True
-                self.txt_explain.setReadOnly(False)
-                sender.setText('Save')
+                if self.show_explain_word:
+                    self.edit_explain_flag = True
+                    self.txt_explain.setReadOnly(False)
+                    sender.setText('Save')
 
     def refresh_tb_statistics(self):
         results = self.statistics_word()
@@ -113,7 +122,7 @@ class YuToolsStatisticsWordEn(QWidget):
         results = {}
         for word in words:
             word = word.lower().strip(' ').strip('.').strip(',').strip('"').strip('\'').strip(';').strip('?').strip(
-                '!').strip(':')
+                '!').strip(':').strip('(').strip(')').strip('[').strip(']').strip('{').strip(']')
             if not word or word in self.wastes:
                 continue
             if word in list(results.keys()):
@@ -122,24 +131,75 @@ class YuToolsStatisticsWordEn(QWidget):
                 results[word] = 1
         return sorted(results.items(), key=lambda kv: kv[1], reverse=True)
 
-    def tb_double_click(self, index):
-        if index.column() == 0:
-            menu = QMenu(self.tb_word_cur)
-            copy_act = menu.addAction(QIcon('icons/statistics_word_en/copy.png'), 'Copy')
-            word_act = menu.addAction(QIcon('icons/statistics_word_en/word.png'), 'Word')
-            waste_act = menu.addAction(QIcon('icons/statistics_word_en/waste.png'), 'Waste')
-            i = index.row()
-            i = i if i < 9 else 8
-            act = menu.exec_(
-                self.mapToGlobal(
-                    QPoint(self.sender().x() + 60 * index.column() + 30, self.sender().y() + 30 * i + 5)))
-            refresh = False
-            if act == copy_act:
-                pyperclip.copy(index.model().item(index.row(), index.column()).text())
-            elif act == word_act:
-                refresh = True
-            elif act == waste_act:
-                refresh = True
+    def refresh_list_waste(self):
+        self.ls_waste.clear()
+        self.wastes.clear()
+        wastes = WasteDao.query_wastes()
+        for waste in wastes:
+            self.wastes.append(waste.word)
+            self.ls_waste.addItem(waste.word)
+
+    def refresh_tb_word(self):
+        words = WordDao.query_words()
+        rows = len(words)
+        if rows == 0:
+            return
+        model = QStandardItemModel(rows, 2)
+        model.setHorizontalHeaderLabels(['Word', 'Amount'])
+        row_index = 0
+        for word in words:
+            qsi_word = QStandardItem(word.word)
+            qsi_word.setEditable(False)
+            qsi_amount = QStandardItem(str(word.amount))
+            qsi_amount.setEditable(False)
+            model.setItem(row_index, 0, qsi_word)
+            model.setItem(row_index, 1, qsi_amount)
+            row_index += 1
+        self.tb_word_his.setModel(model)
+        self.tb_word_his.setColumnWidth(0, 150)
+        self.tb_word_his.setColumnWidth(1, 80)
 
     def tb_click(self, index):
-        print(index)
+        tb = self.sender()
+        if tb == self.tb_word_cur:
+            if index.column() == 0:
+                menu = QMenu(self.tb_word_cur)
+                search_act = menu.addAction(QIcon('icons/statistics_word_en/search.png'), 'Search')
+                copy_act = menu.addAction(QIcon('icons/statistics_word_en/copy.png'), 'Copy')
+                word_act = menu.addAction(QIcon('icons/statistics_word_en/word.png'), 'Word')
+                waste_act = menu.addAction(QIcon('icons/statistics_word_en/waste.png'), 'Waste')
+                i = index.row() - tb.verticalScrollBar().sliderPosition()
+                act = menu.exec_(
+                    self.mapToGlobal(
+                        QPoint(tb.x() + 60 * index.column() + 30, tb.y() + 30 * i + 5)))
+                word = index.model().item(index.row(), index.column()).text()
+                if act == search_act:
+                    self.show_word_explain(word)
+                elif act == copy_act:
+                    pyperclip.copy(word)
+                elif act == word_act:
+                    amount = int(index.model().item(index.row(), index.column() + 1).text())
+                    WordDao.add(Word(word=word, amount=amount))
+                    self.refresh_tb_word()
+                elif act == waste_act:
+                    WasteDao.add(Waste(word=word))
+                    self.refresh_list_waste()
+        elif tb == self.tb_word_his:
+            self.show_word_explain(index.model().item(index.row(), 0).text())
+
+    def show_word_explain(self, word):
+        if self.show_explain_word != word:
+            self.show_explain_word = word
+            exist_word = WordDao.query_by_word(word)
+            if exist_word:
+                self.txt_explain.setText(exist_word.explain)
+            else:
+                self.txt_explain.setText('')
+
+    def remove_waste(self, item):
+        reply = QMessageBox.question(self, 'Message',
+                                     "Are you sure to remove this Waste?", QMessageBox.Yes |
+                                     QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            WasteDao.remove(item.text())
+            self.refresh_list_waste()
