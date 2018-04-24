@@ -1,0 +1,3 @@
+ln -s src <link_name>
+
+ln -s src . 

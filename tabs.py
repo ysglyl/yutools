@@ -11,6 +11,7 @@ from PyQt5.QtGui import QIcon
 from daily_plan.main import YuToolsDailyPlan
 from statistics_word_en.main import YuToolsStatisticsWordEn
 from note_viewer.main import YuToolsNoteViewer
+from image_handler.main import YuToolsImageHandler
 
 
 class YuToolsTabsMain(QWidget):
@@ -28,5 +29,8 @@ class YuToolsTabsMain(QWidget):
 
         self.tab_note_viewer = YuToolsNoteViewer()
         self.tabs.addTab(self.tab_note_viewer, QIcon('icons/note_viewer.png'), 'Note Viewer')
+
+        self.tab_image_handler = YuToolsImageHandler()
+        self.tabs.addTab(self.tab_image_handler, QIcon('icons/image_handler.png'), 'Image Handler')
 
         self.tabs.setCurrentIndex(2)

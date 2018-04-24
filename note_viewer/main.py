@@ -109,10 +109,12 @@ class YuToolsNoteViewer(QWidget):
         file_name, success = QInputDialog.getText(self, "Title", "File Name:", QLineEdit.Normal,
                                                   ordinary_filename.split('.')[0])
         if success:
+            if file_name.strip(' ') == '':
+                return
             if is_dir:
-                os.rename(self.select_path, path + os.path.sep + file_name)
+                os.rename(self.select_path, path + os.path.sep + file_name.strip(' '))
             else:
-                os.rename(self.select_path, path + os.path.sep + file_name + '.txt')
+                os.rename(self.select_path, path + os.path.sep + file_name.strip(' ') + '.txt')
 
     def btn_click(self):
         btn = self.sender()
@@ -126,17 +128,19 @@ class YuToolsNoteViewer(QWidget):
         else:
             file_name, success = QInputDialog.getText(self, "Title", "File Name:", QLineEdit.Normal, '')
             if success:
+                if file_name.strip(' ') == '':
+                    return
                 if btn == self.btn_add_root:
                     path = os.path.dirname(
-                        os.path.realpath(__file__)) + os.path.sep + 'notes' + os.path.sep + file_name.lower()
+                        os.path.realpath(__file__)) + os.path.sep + 'notes' + os.path.sep + file_name.strip(' ')
                     if not os.path.exists(path):
                         os.mkdir(path)
                 elif btn == self.btn_add_sub:
-                    path = self.select_path + os.path.sep + file_name.lower()
+                    path = self.select_path + os.path.sep + file_name.strip(' ')
                     if not os.path.exists(path):
                         os.mkdir(path)
                 elif btn == self.btn_add_note:
-                    path = self.select_path + os.path.sep + file_name.lower() + '.txt'
+                    path = self.select_path + os.path.sep + file_name.strip(' ') + '.txt'
                     if not os.path.exists(path):
                         open(path, mode='w')
 

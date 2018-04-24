@@ -1,0 +1,6 @@
+vi file
+
+search:   /searchword    
+
+press n to next
+search total num:  :%s/searchword//gn

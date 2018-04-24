@@ -1,0 +1,30 @@
+git config --global user.name 'YuShigui'
+git config --global user.email yushigui@email.com
+
+git config --list
+
+git init
+
+git clone https://github.com/ysglyl/yutools.git
+
+git status [-s]
+
+git add file
+
+git diff [--cached]
+
+git commit -m 'msg'
+
+git commit -a -m 'msg'
+
+git rm file   # remove from stage and delete from IO
+
+git rm --cached file #remove from stage bug keep on IO
+
+git checkout -- file  #give up the changes in workspace 
+
+git reset HEAD file #give up the changes in stage
+
+git push -u origin master  #first time use -u
+
+

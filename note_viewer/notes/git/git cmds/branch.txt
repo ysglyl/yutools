@@ -1,0 +1,14 @@
+git checkout -b dev   == git branch dev + git checkout dev
+
+git branch
+
+
+git checkout master
+git merge dev  #merge branch(dev) into current branch(master)
+
+git branch -d dev #delete branch(dev)
+
+git add file
+git commit -m 'fixed conflict'
+
+git log --graph
