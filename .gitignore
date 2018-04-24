@@ -3,6 +3,5 @@ __pycache__
 *.xml
 *.iml
 designer.py
-*.db
 test.py
 note_viewer/notes/**

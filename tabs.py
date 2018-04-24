@@ -30,6 +30,3 @@ class YuToolsTabsMain(QWidget):
         self.tabs.addTab(self.tab_note_viewer, QIcon('icons/note_viewer.png'), 'Note Viewer')
 
         self.tabs.setCurrentIndex(2)
-
-    def closeEvent(self, QCloseEvent):
-        print(1)
