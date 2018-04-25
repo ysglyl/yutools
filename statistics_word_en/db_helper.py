@@ -56,6 +56,11 @@ class WordDao(object):
             session.commit()
 
     @staticmethod
+    def remove(word):
+        session.delete(session.query(Word).filter(Word.word == word).first())
+        session.commit()
+
+    @staticmethod
     def update(word, explain):
         session.query(Word).filter(Word.word == word).update({Word.explain: explain})
         session.commit()

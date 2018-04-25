@@ -14,3 +14,7 @@ git commit -m 'fixed conflict'
 git log --graph
 
 git merge --no-ff -m 'not fast-ward merge' dev
+
+git branch -D dev  #force delete
+
+git remote [-v]

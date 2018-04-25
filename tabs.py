@@ -33,4 +33,4 @@ class YuToolsTabsMain(QWidget):
         self.tab_image_handler = YuToolsImageHandler()
         self.tabs.addTab(self.tab_image_handler, QIcon('icons/image_handler.png'), 'Image Handler')
 
-        self.tabs.setCurrentIndex(2)
+        self.tabs.setCurrentIndex(3)

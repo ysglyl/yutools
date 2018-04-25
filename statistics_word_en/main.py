@@ -115,6 +115,7 @@ class YuToolsStatisticsWordEn(QWidget):
         self.tb_word_cur.setModel(model)
         self.tb_word_cur.setColumnWidth(0, 120)
         self.tb_word_cur.setColumnWidth(1, 60)
+        self.tb_word_cur.setSortingEnabled(True)
 
     def statistics_word(self):
         content = self.txt_content.toPlainText().replace('\n', ' ').strip('')
@@ -158,6 +159,7 @@ class YuToolsStatisticsWordEn(QWidget):
         self.tb_word_his.setModel(model)
         self.tb_word_his.setColumnWidth(0, 150)
         self.tb_word_his.setColumnWidth(1, 80)
+        self.tb_word_his.setSortingEnabled(True)
 
     def tb_click(self, index):
         tb = self.sender()
@@ -185,7 +187,18 @@ class YuToolsStatisticsWordEn(QWidget):
                     WasteDao.add(Waste(word=word))
                     self.refresh_list_waste()
         elif tb == self.tb_word_his:
-            self.show_word_explain(index.model().item(index.row(), 0).text())
+            if index.column() == 0:
+                self.show_word_explain(index.model().item(index.row(), 0).text())
+            elif index.column() == 1:
+                menu = QMenu(self.tb_word_cur)
+                del_act = menu.addAction(QIcon('icons/statistics_word_en/delete.png'), 'Delete')
+                i = index.row() - tb.verticalScrollBar().sliderPosition()
+                act = menu.exec_(
+                    self.mapToGlobal(
+                        QPoint(tb.x() + 180, tb.y() + 30 * i + 24)))
+                if act == del_act:
+                    WordDao.remove(index.model().item(index.row(), 0).text())
+                    self.refresh_tb_word()
 
     def show_word_explain(self, word):
         if self.show_explain_word != word:
