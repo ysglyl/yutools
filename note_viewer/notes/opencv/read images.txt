@@ -1,0 +1,10 @@
+img_bgra = cv2.imread(image, -1)
+img_gray = cv2.imread(image,0)
+img_bgr = cv2.imread(image,1)
+
+b, g, r, a = cv2.split(img)
+img_rgba = cv2.merge([r, g, b, a])
+q_image = QImage(img, img.shape[1], img.shape[0], QImage.Format_RGBA8888)
+q_pixmap = QPixmap(q_image)
+q_pixmap = q_pixmap.scaled(450, 380, Qt.KeepAspectRatio)
+self.img_result_view.setPixmap(q_pixmap)

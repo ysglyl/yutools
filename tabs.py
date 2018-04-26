@@ -21,16 +21,16 @@ class YuToolsTabsMain(QWidget):
         self.tabs = QTabWidget(parent)
         self.tabs.setGeometry(0, 0, 805, 705)
 
+        self.tab_note_viewer = YuToolsNoteViewer()
+        self.tabs.addTab(self.tab_note_viewer, QIcon('icons/note_viewer.png'), 'Note Viewer')
+
         self.tab_daily_plan = YuToolsDailyPlan()
         self.tabs.addTab(self.tab_daily_plan, QIcon('icons/daily_plan.png'), "Daily Plan")
 
         self.tab_statistics_word_en = YuToolsStatisticsWordEn()
         self.tabs.addTab(self.tab_statistics_word_en, QIcon('icons/statistics_word_en.png'), "Statistics EN")
 
-        self.tab_note_viewer = YuToolsNoteViewer()
-        self.tabs.addTab(self.tab_note_viewer, QIcon('icons/note_viewer.png'), 'Note Viewer')
-
         self.tab_image_handler = YuToolsImageHandler()
         self.tabs.addTab(self.tab_image_handler, QIcon('icons/image_handler.png'), 'Image Handler')
 
-        self.tabs.setCurrentIndex(3)
+        self.tabs.setCurrentIndex(0)

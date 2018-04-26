@@ -31,12 +31,6 @@ class YuToolsStatisticsWordEn(QWidget):
         self.btn_statistics.setGeometry(520, 170, 30, 26)
         self.btn_statistics.clicked.connect(self.click_handler)
 
-        self.lbl_op_tips = QLabel(self)
-        self.lbl_op_tips.setText('Double click table cell for more operations')
-        self.lbl_op_tips.setFont(font)
-        self.lbl_op_tips.setStyleSheet("color: rgb(0, 0, 255);")
-        self.lbl_op_tips.setGeometry(440, 10, 350, 22)
-
         self.tb_word_cur = QTableView(self)
         self.tb_word_cur.horizontalHeader().setStretchLastSection(True)
         self.tb_word_cur.horizontalHeader().setSectionResizeMode(QHeaderView.Custom)
@@ -59,14 +53,12 @@ class YuToolsStatisticsWordEn(QWidget):
         self.tb_word_his.clicked.connect(self.tb_click)
 
         self.txt_explain = QTextEdit(self)
-        self.txt_explain.setReadOnly(True)
         self.txt_explain.setGeometry(470, 335, 321, 310)
 
         self.btn_edit_explain = QPushButton(self)
-        self.btn_edit_explain.setText('Edit')
+        self.btn_edit_explain.setText('Save')
         self.btn_edit_explain.clicked.connect(self.click_handler)
         self.btn_edit_explain.setGeometry(730, 650, 60, 26)
-        self.edit_explain_flag = False
 
         self.wastes = []
         self.refresh_list_waste()
@@ -87,16 +79,8 @@ class YuToolsStatisticsWordEn(QWidget):
         if sender == self.btn_statistics:
             self.refresh_tb_statistics()
         elif sender == self.btn_edit_explain:
-            if self.edit_explain_flag:
-                self.edit_explain_flag = False
+            if self.show_explain_word:
                 WordDao.update(self.show_explain_word, self.txt_explain.toPlainText())
-                sender.setText('Edit')
-                self.txt_explain.setReadOnly(True)
-            else:
-                if self.show_explain_word:
-                    self.edit_explain_flag = True
-                    self.txt_explain.setReadOnly(False)
-                    sender.setText('Save')
 
     def refresh_tb_statistics(self):
         results = self.statistics_word()
@@ -197,8 +181,7 @@ class YuToolsStatisticsWordEn(QWidget):
                     self.mapToGlobal(
                         QPoint(tb.x() + 180, tb.y() + 30 * i + 24)))
                 if act == del_act:
-                    WordDao.remove(index.model().item(index.row(), 0).text())
-                    self.refresh_tb_word()
+                    self.remove_word(index.model().item(index.row(), 0).text())
 
     def show_word_explain(self, word):
         if self.show_explain_word != word:
@@ -216,3 +199,11 @@ class YuToolsStatisticsWordEn(QWidget):
         if reply == QMessageBox.Yes:
             WasteDao.remove(item.text())
             self.refresh_list_waste()
+
+    def remove_word(self, word):
+        reply = QMessageBox.question(self, 'Message',
+                                     "Are you sure to remove this Word?", QMessageBox.Yes |
+                                     QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            WordDao.remove(word)
+            self.refresh_tb_word()
