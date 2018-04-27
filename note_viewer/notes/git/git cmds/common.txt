@@ -27,4 +27,6 @@ git reset HEAD file #give up the changes in stage
 
 git push -u origin master  #first time use -u
 
+git mv src dest
+
 

@@ -12,6 +12,7 @@ from daily_plan.main import YuToolsDailyPlan
 from statistics_word_en.main import YuToolsStatisticsWordEn
 from note_viewer.main import YuToolsNoteViewer
 from image_handler.main import YuToolsImageHandler
+from video_handler.main import YuToolsVideoHandler
 
 
 class YuToolsTabsMain(QWidget):
@@ -32,5 +33,8 @@ class YuToolsTabsMain(QWidget):
 
         self.tab_image_handler = YuToolsImageHandler()
         self.tabs.addTab(self.tab_image_handler, QIcon('icons/image_handler.png'), 'Image Handler')
+
+        self.tab_video_handler = YuToolsVideoHandler()
+        self.tabs.addTab(self.tab_image_handler, QIcon('icons/video_handler.png'), 'Video Handler')
 
         self.tabs.setCurrentIndex(0)

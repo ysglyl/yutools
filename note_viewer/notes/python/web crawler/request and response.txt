@@ -1,0 +1,28 @@
+Request Method
+
+Request URL
+	GET  HEAD  POST  PUT DELETE CONNECT OPTIONS  TRACE
+
+Request Headers
+	Accept
+	Accept-Language
+	Accept-Encoding
+	Host
+	Cookie
+	Referer
+	User-Agent
+	Content-Type
+
+Request Body
+
+Response Status Code
+
+Response Headers
+	Date
+	Last-Modified
+	Content-Encoding
+	Server
+	Content-Type
+	Set-Cookie
+	Expires
+Response Body
