@@ -35,6 +35,6 @@ class YuToolsTabsMain(QWidget):
         self.tabs.addTab(self.tab_image_handler, QIcon('icons/image_handler.png'), 'Image Handler')
 
         self.tab_video_handler = YuToolsVideoHandler()
-        self.tabs.addTab(self.tab_image_handler, QIcon('icons/video_handler.png'), 'Video Handler')
+        self.tabs.addTab(self.tab_video_handler, QIcon('icons/video_handler.png'), 'Video Handler')
 
         self.tabs.setCurrentIndex(0)

@@ -53,11 +53,11 @@ class YuToolsImageHandler(QWidget):
         if btn == self.img_major_view:
             if filename[0]:
                 self.img_major = filename[0]
-                self.img_major_view.setIcon(QIcon(filename[0]))
+                self.img_major_view.setIcon(QIcon(self.img_major))
         elif btn == self.img_minor_view:
             if filename[0]:
                 self.img_minor = filename[0]
-                self.img_minor_view.setIcon(QIcon(filename[0]))
+                self.img_minor_view.setIcon(QIcon(self.img_minor))
 
     def click_detect(self):
         btn = self.sender()
