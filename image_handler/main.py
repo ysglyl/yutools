@@ -69,7 +69,7 @@ class YuToolsImageHandler(QWidget):
                 fmt = QImage.Format_RGB888
             elif pipe == 4:
                 fmt = QImage.Format_RGBA8888
-            q_image = QImage(img, img.shape[1], img.shape[0], fmt)
+            q_image = QImage(img.data, img.shape[1], img.shape[0], fmt)
             q_pixmap = QPixmap(q_image)
             q_pixmap = q_pixmap.scaled(450, 380, Qt.KeepAspectRatio)
             self.img_result_view.setPixmap(q_pixmap)

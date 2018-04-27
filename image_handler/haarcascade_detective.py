@@ -21,9 +21,7 @@ class HaarcascadeDetective(object):
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 1, cv2.LINE_AA)
         if len(img[0][0]) == 4:
-            b, g, r, a = cv2.split(img)
-            return 4, cv2.merge([r, g, b, a])
+            return 4, cv2.cvtColor(img, cv2.COLOR_BGRA2RGBA)
         elif len(img[0][0] == 3):
-            b, g, r = cv2.split(img)
-            return 3, cv2.merge([r, g, b])
+            return 3, cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         return 0, None
