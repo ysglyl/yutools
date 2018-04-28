@@ -1,4 +1,5 @@
 import os
+import cv2
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QFrame, QFileDialog
 from PyQt5.QtGui import QIcon, QImage, QPixmap
@@ -12,7 +13,12 @@ class YuToolsImageHandler(QWidget):
         self.btn_detect_face = QPushButton(self)
         self.btn_detect_face.setText('Detect Face')
         self.btn_detect_face.setGeometry(10, 10, 80, 26)
-        self.btn_detect_face.clicked.connect(self.click_detect)
+        self.btn_detect_face.clicked.connect(self.click_handle)
+
+        self.btn_show_gray = QPushButton(self)
+        self.btn_show_gray.setText('Gray')
+        self.btn_show_gray.setGeometry(100, 10, 80, 26)
+        self.btn_show_gray.clicked.connect(self.click_handle)
 
         self.img_major_view = QPushButton(self)
         self.img_major_view.setGeometry(340, 10, 220, 220)
@@ -59,7 +65,7 @@ class YuToolsImageHandler(QWidget):
                 self.img_minor = filename[0]
                 self.img_minor_view.setIcon(QIcon(self.img_minor))
 
-    def click_detect(self):
+    def click_handle(self):
         btn = self.sender()
         if btn == self.btn_detect_face:
             pipe, img = HaarcascadeDetective().get_face_classifier().get_face(self.img_major)
@@ -69,7 +75,11 @@ class YuToolsImageHandler(QWidget):
                 fmt = QImage.Format_RGB888
             elif pipe == 4:
                 fmt = QImage.Format_RGBA8888
-            q_image = QImage(img.data, img.shape[1], img.shape[0], fmt)
-            q_pixmap = QPixmap(q_image)
-            q_pixmap = q_pixmap.scaled(450, 380, Qt.KeepAspectRatio)
-            self.img_result_view.setPixmap(q_pixmap)
+        elif btn == self.btn_show_gray:
+            img = cv2.imread(self.img_major, 0)
+            fmt = QImage.Format_Grayscale8
+            pipe = 1
+        q_image = QImage(img, img.shape[1], img.shape[0], img.shape[1] * pipe, fmt)
+        q_pixmap = QPixmap.fromImage(q_image)
+        q_pixmap = q_pixmap.scaled(450, 380, Qt.KeepAspectRatio)
+        self.img_result_view.setPixmap(q_pixmap)
