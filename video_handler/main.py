@@ -1,3 +1,4 @@
+from threading import Thread
 import os
 import cv2
 import time
@@ -74,7 +75,7 @@ class YuToolsVideoHandler(QWidget):
                 self.flag_show_gray = False
 
     def open_camera(self):
-        self.change_btn_status((False, False, False))
+        self.change_btn_status((False, False, True))
         self.video_capture = cv2.VideoCapture(0)
         self.start_play()
 
@@ -88,17 +89,20 @@ class YuToolsVideoHandler(QWidget):
 
     def change_btn_status(self, status=(True, True, False)):
         self.btn_open_camera.setDisabled(not status[0])
-        self.btn_open_video.setDisabled(not status[2])
-        self.btn_stop_play.setDisabled(not status[1])
+        self.btn_open_video.setDisabled(not status[1])
+        self.btn_stop_play.setDisabled(not status[2])
 
     def start_play(self):
         self.is_playing = True
-        fps = self.video_capture.get(cv2.CAP_PROP_FPS)
-        size = (int(self.video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                int(self.video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        play_thread = Thread(target=self.play)
+        play_thread.setDaemon(True)
+        play_thread.start()
 
+    def play(self):
+        fps = self.video_capture.get(cv2.CAP_PROP_FPS)
+        print(fps)
         while self.video_capture.isOpened():
-            if not self.is_playing:
+            if (not self.is_playing) or (not self.parent().parent().parent().app_running):
                 break
             ret, frame = self.video_capture.read()
             if ret:
@@ -118,12 +122,17 @@ class YuToolsVideoHandler(QWidget):
         self.is_playing = False
 
     def handle_image(self, image):
+        pipe = 3
+        fmt = QImage.Format_RGB888
+        flag_handle = False
         if self.flag_detect_fact:
-            pipe = 3
-            fmt = QImage.Format_RGB888
             image = HaarcascadeDetective().get_face_classifier().get_face(image)
+            flag_handle = True
         if self.flag_show_gray:
             pipe = 1
             fmt = QImage.Format_Grayscale8
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            flag_handle = True
+        if not flag_handle:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return pipe, fmt, image
