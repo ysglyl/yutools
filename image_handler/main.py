@@ -1,5 +1,6 @@
 import os
 import cv2
+import time
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QFrame, QFileDialog
 from PyQt5.QtGui import QIcon, QImage, QPixmap

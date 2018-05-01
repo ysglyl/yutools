@@ -2,6 +2,7 @@ from threading import Thread
 import os
 import cv2
 import time
+import queue
 
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QWidget, QCheckBox, QLabel, QFrame, QPushButton, QFileDialog
@@ -18,6 +19,8 @@ class YuToolsVideoHandler(QWidget):
 
         self.flag_detect_fact = False
         self.flag_show_gray = False
+
+        self.frame_queue = queue.deque(maxlen=30)
 
         self.btn_open_camera = QPushButton(self)
         self.btn_open_camera.setText('Open Camera')
@@ -95,25 +98,22 @@ class YuToolsVideoHandler(QWidget):
     def start_play(self):
         self.is_playing = True
         play_thread = Thread(target=self.play)
-        play_thread.setDaemon(True)
         play_thread.start()
 
     def play(self):
         fps = self.video_capture.get(cv2.CAP_PROP_FPS)
-        print(fps)
+        vfs = VideoFrameSleep(fps)
         while self.video_capture.isOpened():
             if (not self.is_playing) or (not self.parent().parent().parent().app_running):
                 break
             ret, frame = self.video_capture.read()
             if ret:
-                pipe, fmt, handled_frame = self.handle_image(frame)
-                q_image = QImage(handled_frame, handled_frame.shape[1], handled_frame.shape[0],
-                                 handled_frame.shape[1] * pipe, fmt)
+                pipe, fmt, img = self.handle_image(frame)
+                q_image = QImage(img, img.shape[1], img.shape[0], img.shape[1] * pipe, fmt)
                 q_pixmap = QPixmap.fromImage(q_image)
                 q_pixmap = q_pixmap.scaled(640, 480, Qt.KeepAspectRatio)
                 self.video_view.setPixmap(q_pixmap)
-            if fps != 0:
-                time.sleep(1.0 / fps)
+            vfs.sleep_for_sec()
 
         self.video_view.clear()
         self.video_capture.release()
@@ -136,3 +136,18 @@ class YuToolsVideoHandler(QWidget):
         if not flag_handle:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return pipe, fmt, image
+
+
+class VideoFrameSleep(object):
+
+    def __init__(self, fps):
+        self.fps = fps
+        self.last_time = time.time()
+
+    def sleep_for_sec(self):
+        sec_diff = time.time() - self.last_time
+        if self.fps > 0:
+            sec = 1.0 / self.fps - sec_diff
+            if sec > 0:
+                time.sleep(sec)
+        self.last_time = time.time()
