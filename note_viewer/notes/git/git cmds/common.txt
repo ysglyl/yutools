@@ -29,4 +29,6 @@ git push -u origin master  #first time use -u
 
 git mv src dest
 
+git push origin HEAD:refs/for/master
+
 

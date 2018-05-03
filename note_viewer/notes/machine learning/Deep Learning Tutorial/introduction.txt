@@ -1,3 +1,22 @@
 ﻿Machine Learning ~= Looking for a Function
 
+step1: define a set of function
+step2: goodness of function(training)
+step3: pick the best function
 
+
+Neuron:
+z = a1w1 + ... + akwk + ... + aKwK + b
+
+Sigmoid Function:
+1/(1+e^-z)
+
+Different connections leads to different network structure
+Each neurons can have different values of weights and biases 
+
+Fully Connect Feedforward Network
+
+Given parameters, define a function
+Given network structure, define a function set
+
+Gradient Descent
