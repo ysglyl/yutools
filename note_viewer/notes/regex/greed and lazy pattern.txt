@@ -1,2 +1,2 @@
-\w+    greed pattern
+﻿\w+    greed pattern
 \w+?    lazy pattern

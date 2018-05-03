@@ -1,4 +1,4 @@
-1.slice
+﻿1.slice
 
 word = 'this is a original string'
 slice_str = word[1:6]   >>>> 'his i'

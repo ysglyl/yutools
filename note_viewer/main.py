@@ -97,7 +97,7 @@ class YuToolsNoteViewer(QWidget):
             self.btn_add_note.setDisabled(True)
             self.btn_save_note.setDisabled(False)
             self.te_note.setDisabled(False)
-            file = open(self.select_path, mode='r')
+            file = open(self.select_path, mode='r', encoding='utf-8')
             for line in file.readlines():
                 self.te_note.append(line.strip('\n'))
             file.close()
@@ -121,7 +121,7 @@ class YuToolsNoteViewer(QWidget):
         if btn == self.btn_save_note:
             content = self.te_note.toPlainText()
             lines = content.split('\n')
-            file = open(self.select_path, mode='w+')
+            file = open(self.select_path, mode='w+', encoding='utf-8')
             for line in lines:
                 file.write(line + '\n')
             file.close()
@@ -142,7 +142,7 @@ class YuToolsNoteViewer(QWidget):
                 elif btn == self.btn_add_note:
                     path = self.select_path + os.path.sep + file_name.strip(' ') + '.txt'
                     if not os.path.exists(path):
-                        open(path, mode='w')
+                        open(path, mode='w', encoding='utf-8')
 
     def change_font_size(self):
         rb = self.sender()

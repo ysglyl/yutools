@@ -1,4 +1,4 @@
-img_bgra = cv2.imread(image, -1)
+﻿img_bgra = cv2.imread(image, -1)
 img_gray = cv2.imread(image,0)
 img_bgr = cv2.imread(image,1)
 

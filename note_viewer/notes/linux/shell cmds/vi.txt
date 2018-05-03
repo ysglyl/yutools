@@ -1,4 +1,4 @@
-vi file
+﻿vi file
 
 search:   /searchword    
 
